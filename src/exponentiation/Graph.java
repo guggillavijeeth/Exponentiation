@@ -1,6 +1,8 @@
 package exponentiation;
 
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -114,21 +116,30 @@ public class Graph
      * Driver routine to handle unreachables and print total cost.
      * It calls recursive routine to print shortest path to
      * destNode after a shortest path algorithm has run.
+     * @throws IOException 
      */
-    public void printPath( String destName )
+    public void printPath( String destName, File output ) throws IOException
     {
-        Vertex w = vertexMap.get( destName );
-        if( w == null )
-            throw new NoSuchElementException( "Destination vertex not found" );
-        else if( w.dist == INFINITY )
-            System.out.println( destName + " is unreachable" );
-        else
-        {
-            System.out.print( "(Cost is: " + w.dist + ") " );
-            printPath( w );
-            System.out.println( );
-        }
+    	FileWriter fw = new FileWriter(output);
+
+    	Vertex w = vertexMap.get( destName );
+    	if( w == null ) {
+    		fw.close();
+    		throw new NoSuchElementException( "Destination vertex not found" );
+    	}
+    	else if( w.dist == INFINITY )
+    		System.out.println( destName + " is unreachable" );
+    	else
+    	{
+    		System.out.print( "(Cost is: " + w.dist + ") " );
+    		fw.write("(Cost is: " + w.dist + ") ");
+    		printPath( w, fw );
+    		System.out.println( );
+    		fw.write("\n");
+    		fw.close();
+    	}
     }
+
 
     /**
      * If vertexName is not present, add it to vertexMap.
@@ -149,15 +160,18 @@ public class Graph
      * Recursive routine to print shortest path to dest
      * after running shortest path algorithm. The path
      * is known to exist.
+     * @throws IOException 
      */
-    private void printPath( Vertex dest )
+    private void printPath( Vertex dest, FileWriter fw ) throws IOException
     {
         if( dest.prev != null )
         {
-            printPath( dest.prev );
+            printPath( dest.prev, fw );
             System.out.print( " to " );
+            fw.write("to");
         }
         System.out.print( dest.name );
+        fw.write(dest.name);
     }
     
     /**
@@ -346,7 +360,7 @@ public class Graph
             String startName = in.nextLine( );
 
             System.out.print( "Enter destination node:" );
-            String destName = in.nextLine( );
+            //String destName = in.nextLine( );
 
             System.out.print( "Enter algorithm (u, d, n, a ): " );
             String alg = in.nextLine( );
@@ -356,14 +370,14 @@ public class Graph
             else if( alg.equals( "d" ) )    
             {
                 g.dijkstra( startName );
-                g.printPath( destName );
+                //g.printPath( destName );
             }
             else if( alg.equals( "n" ) )
                 g.negative( startName );
             else if( alg.equals( "a" ) )
                 g.acyclic( startName );
                     
-            g.printPath( destName );
+            //g.printPath( destName );
         }
         catch( NoSuchElementException e )
           { return false; }
@@ -411,6 +425,7 @@ public class Graph
                 catch( NumberFormatException e )
                   { System.err.println( "Skipping ill-formatted line " + line ); }
              }
+            graphFile.close();
          }
          catch( IOException e )
            { System.err.println( e ); }

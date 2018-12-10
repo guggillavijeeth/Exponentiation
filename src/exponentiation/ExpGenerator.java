@@ -1,21 +1,13 @@
 package exponentiation;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class ExpGenerator {
 
 	public static void main (String [] args) {
 		
-		File output = new File(args[1]);
-		FileWriter fw;
-		
-		try {
-			fw = new FileWriter(output);
-		} catch (IOException e) {
-			System.err.println(e);
-		}
+		File output = new File(args[0]);
 		
 		//TODO: check if Java 10 allows public final
 		final int maxExponent = 1000;
@@ -42,7 +34,18 @@ public class ExpGenerator {
 		for(int i=0; i<=1000; i++) {
 			//System.out.println("i");
 			//TODO: printPath returns void!
-			fw.write(expGraph.printPath(""+i));
+			try {
+				expGraph.printPath(""+i, output);
+			} catch (IOException e) {
+				System.err.println(e);
+			}
+		}
+		
+		try {
+			expGraph.printPath("500", output);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }
